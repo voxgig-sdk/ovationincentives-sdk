@@ -1,0 +1,154 @@
+
+const envlocal = __dirname + '/../../../.env.local'
+require('dotenv').config({ quiet: true, path: [envlocal] })
+
+import Path from 'node:path'
+import * as Fs from 'node:fs'
+
+import { test, describe, afterEach } from 'node:test'
+import assert from 'node:assert'
+
+
+import { OvationincentivesSDK, BaseFeature, stdutil } from '../../..'
+
+import {
+  envOverride,
+  liveDelay,
+  makeCtrl,
+  makeMatch,
+  makeReqdata,
+  makeStepData,
+  makeValid,
+  maybeSkipControl,
+} from '../../utility'
+
+
+describe('CodeEntity', async () => {
+
+  // Per-test live pacing. Delay is read from sdk-test-control.json's
+  // `test.live.delayMs`; only sleeps when OVATIONINCENTIVES_TEST_LIVE=TRUE.
+  afterEach(liveDelay('OVATIONINCENTIVES_TEST_LIVE'))
+
+  test('instance', async () => {
+    const testsdk = OvationincentivesSDK.test()
+    const ent = testsdk.Code()
+    assert(null != ent)
+  })
+
+
+  test('basic', async (t) => {
+
+    const live = 'TRUE' === process.env.OVATIONINCENTIVES_TEST_LIVE
+    for (const op of ['create', 'load']) {
+      if (maybeSkipControl(t, 'entityOp', 'code.' + op, live)) return
+    }
+
+    const setup = basicSetup()
+    // The basic flow consumes synthetic IDs and field values from the
+    // fixture (entity TestData.json). Those don't exist on the live API.
+    // Skip live runs unless the user provided a real ENTID env override.
+    if (setup.syntheticOnly) {
+      t.skip('live entity test uses synthetic IDs from fixture — set OVATIONINCENTIVES_TEST_CODE_ENTID JSON to run live')
+      return
+    }
+    const client = setup.client
+    const struct = setup.struct
+
+    const isempty = struct.isempty
+    const select = struct.select
+
+
+    // CREATE
+    const code_ref01_ent = client.Code()
+    let code_ref01_data = setup.data.new.code['code_ref01']
+
+    code_ref01_data = (await code_ref01_ent.create(code_ref01_data)).data()
+    assert(null != code_ref01_data.id)
+
+
+    // LOAD
+    const code_ref01_match_dt0: any = {}
+    code_ref01_match_dt0.id = code_ref01_data.id
+    const code_ref01_data_dt0 = (await code_ref01_ent.load(code_ref01_match_dt0)).data()
+    assert(code_ref01_data_dt0.id === code_ref01_data.id)
+
+
+  })
+})
+
+
+
+function basicSetup(extra?: any) {
+  // TODO: fix test def options
+  const options: any = {} // null
+
+  // TODO: needs test utility to resolve path
+  const entityDataFile =
+    Path.resolve(__dirname, 
+      '../../../../.sdk/test/entity/code/CodeTestData.json')
+
+  // TODO: file ready util needed?
+  const entityDataSource = Fs.readFileSync(entityDataFile).toString('utf8')
+
+  // TODO: need a xlang JSON parse utility in voxgig/struct with better error msgs
+  const entityData = JSON.parse(entityDataSource)
+
+  options.entity = entityData.existing
+
+  let client = OvationincentivesSDK.test(options, extra)
+  const struct = client.utility().struct
+  const merge = struct.merge
+  const transform = struct.transform
+
+  let idmap = transform(
+    ['code01','code02','code03'],
+    {
+      '`$PACK`': ['', {
+        '`$KEY`': '`$COPY`',
+        '`$VAL`': ['`$FORMAT`', 'upper', '`$COPY`']
+      }]
+    })
+
+  // Detect whether the user provided a real ENTID JSON via env var. The
+  // basic flow consumes synthetic IDs from the fixture file; without an
+  // override those synthetic IDs reach the live API and 4xx. Surface this
+  // to the test so it can skip rather than fail.
+  const idmapEnvVal = process.env['OVATIONINCENTIVES_TEST_CODE_ENTID']
+  const idmapOverridden = null != idmapEnvVal && idmapEnvVal.trim().startsWith('{')
+
+  const env = envOverride({
+    'OVATIONINCENTIVES_TEST_CODE_ENTID': idmap,
+    'OVATIONINCENTIVES_TEST_LIVE': 'FALSE',
+    'OVATIONINCENTIVES_TEST_EXPLAIN': 'FALSE',
+    'OVATIONINCENTIVES_APIKEY': 'NONE',
+  })
+
+  idmap = env['OVATIONINCENTIVES_TEST_CODE_ENTID']
+
+  const live = 'TRUE' === env.OVATIONINCENTIVES_TEST_LIVE
+
+  if (live) {
+    client = new OvationincentivesSDK(merge([
+      {
+        apikey: env.OVATIONINCENTIVES_APIKEY,
+      },
+      extra
+    ]))
+  }
+
+  const setup = {
+    idmap,
+    env,
+    options,
+    client,
+    struct,
+    data: entityData,
+    explain: 'TRUE' === env.OVATIONINCENTIVES_TEST_EXPLAIN,
+    live,
+    syntheticOnly: live && !idmapOverridden,
+    now: Date.now(),
+  }
+
+  return setup
+}
+  

@@ -1,0 +1,87 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Ovation Incentives Code API",
+    "version": "1.0.0",
+    "description": "Issue Ovation Incentives reward codes."
+  },
+  "servers": [
+    { "url": "https://external-sandbox.ovationincentives.com" }
+  ],
+  "security": [
+    { "bearerAuth": [] }
+  ],
+  "paths": {
+    "/api/Code": {
+      "post": {
+        "operationId": "createCode",
+        "summary": "Issue a reward code",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/CodeInput" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The issued code",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Code" }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "operationId": "getCode",
+        "summary": "Retrieve a code",
+        "parameters": [
+          { "name": "id", "in": "query", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "The requested code",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Code" }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer"
+      }
+    },
+    "schemas": {
+      "CodeInput": {
+        "type": "object",
+        "required": ["catalog_id", "denomination"],
+        "properties": {
+          "catalog_id": { "type": "string" },
+          "denomination": { "type": "number" },
+          "recipient_email": { "type": "string" }
+        }
+      },
+      "Code": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "catalog_id": { "type": "string" },
+          "denomination": { "type": "number" },
+          "recipient_email": { "type": "string" },
+          "status": { "type": "string" },
+          "created_at": { "type": "string" }
+        }
+      }
+    }
+  }
+}

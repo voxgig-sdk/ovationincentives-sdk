@@ -1,0 +1,41 @@
+{
+  "existing": {
+    "code": {
+      "CODE00": {
+        "catalog_id": "CATALOG01",
+        "created_at": "s3d",
+        "denomination": 62,
+        "id": "CODE00",
+        "recipient_email": "s40",
+        "status": "s41"
+      },
+      "CODE01": {
+        "catalog_id": "CATALOG01",
+        "created_at": "s79",
+        "denomination": 122,
+        "id": "CODE01",
+        "recipient_email": "s7c",
+        "status": "s7d"
+      },
+      "CODE02": {
+        "catalog_id": "CATALOG01",
+        "created_at": "sb5",
+        "denomination": 182,
+        "id": "CODE02",
+        "recipient_email": "sb8",
+        "status": "sb9"
+      }
+    }
+  },
+  "new": {
+    "code": {
+      "code_ref01": {
+        "catalog_id": "CATALOG01",
+        "created_at": "sf1",
+        "denomination": 242,
+        "recipient_email": "sf4",
+        "status": "sf5"
+      }
+    }
+  }
+}

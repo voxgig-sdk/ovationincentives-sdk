@@ -1,0 +1,27 @@
+# API Information
+
+
+main: {
+  kit: {
+    info: {
+      description: "Issue Ovation Incentives reward codes."
+      security: {
+        in: "header"
+        name: "Authorization"
+        prefix: "Bearer"
+        scheme: "bearerAuth"
+        type: "http"
+      }
+      servers: [
+        {
+          url: "https://external-sandbox.ovationincentives.com"
+        }
+      ]
+      summary: "Issue Ovation Incentives reward codes."
+      title: "Ovation Incentives Code API"
+      version: "1.0.0"
+      website: "https://external-sandbox.ovationincentives.com"
+    }
+  }
+}
+
