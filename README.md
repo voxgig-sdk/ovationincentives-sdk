@@ -10,6 +10,8 @@ This is an unofficial SDK for the Ovation Incentives Code public API, generated 
 
 Learn more about Voxgig SDKs at [voxgig.com/sdk](https://voxgig.com/sdk/).
 
+> TypeScript, Python, PHP, Golang, Lua, JavaScript SDKs, a CLI with an interactive REPL, and an MCP server for AI agents — all generated from one OpenAPI spec by [@voxgig/sdkgen](https://github.com/voxgig/sdkgen).
+
 ## Entities, not endpoints
 
 This SDK exposes the API as a small set of **semantic entities** — Code — that you
@@ -49,11 +51,62 @@ const code = await client.Code().load({ id: 'test01' })
 console.log(code)
 ```
 
+### Python
+
+```python
+client = OvationincentivesSDK.test()
+code = client.Code().load({"id": "test01"})
+print(code)
+```
+
+### PHP
+
+```php
+// Seed fixture data so offline calls resolve without a live server.
+$client = OvationincentivesSDK::test([
+    "entity" => ["code" => ["test01" => ["id" => "test01"]]],
+]);
+$code = $client->Code()->load(["id" => "test01"]);
+```
+
+### Golang
+
+```go
+client := sdk.Test()
+result, err := client.Code(nil).Load(
+    map[string]any{"id": "test01"}, nil,
+)
+```
+
+### Lua
+
+```lua
+local client = sdk.test()
+local result, err = client:Code():load({ id = "test01" })
+```
+
+### JavaScript
+
+```js
+const client = OvationincentivesSDK.test()
+const code = await client.Code().load({ id: 'test01' })
+// code is the entity, populated with mock data
+// — call code.data() for the record itself
+console.log(code)
+```
+
 ## Packages
 
 | Language | Package | Install |
 | --- | --- | --- |
 | TypeScript | `@voxgig-sdk/ovationincentives` | publish pending — [install from git tag](https://github.com/voxgig-sdk/ovationincentives-sdk/releases) |
+| Python | `voxgig-sdk-ovationincentives` | publish pending — [install from git tag](https://github.com/voxgig-sdk/ovationincentives-sdk/releases) |
+| PHP | `voxgig-sdk/ovationincentives` | publish pending — [install from git tag](https://github.com/voxgig-sdk/ovationincentives-sdk/releases) |
+| Golang | `github.com/voxgig-sdk/ovationincentives-sdk/go` | `go get github.com/voxgig-sdk/ovationincentives-sdk/go@latest` |
+| Lua | `voxgig-sdk-ovationincentives` | publish pending — [install from git tag](https://github.com/voxgig-sdk/ovationincentives-sdk/releases) |
+| JavaScript | `@voxgig-sdk/ovationincentives-js` | publish pending — [install from git tag](https://github.com/voxgig-sdk/ovationincentives-sdk/releases) |
+| Go CLI | `github.com/voxgig-sdk/ovationincentives-sdk/go-cli` | `go install github.com/voxgig-sdk/ovationincentives-sdk/go-cli/cmd/ovationincentives@latest` |
+| Go MCP server | `github.com/voxgig-sdk/ovationincentives-sdk/go-mcp` | `go get github.com/voxgig-sdk/ovationincentives-sdk/go-mcp@latest` |
 
 ## Quickstart
 
@@ -77,7 +130,31 @@ See the [TypeScript README](ts/README.md) for the full guide.
 
 | Surface | Path |
 | --- | --- |
-| **SDK** (TypeScript) | `ts/` |
+| **SDK** (TypeScript, Python, PHP, Golang, Lua, JavaScript) | `ts/` `py/` `php/` `go/` `lua/` `js/` |
+| **CLI** | `go-cli/` |
+| **MCP server** | `go-mcp/` |
+
+## Use it from an AI agent (MCP)
+
+The generated MCP server exposes every operation in this SDK as an
+[MCP](https://modelcontextprotocol.io) tool that Claude, Cursor or Cline
+can call directly. Build and register it:
+
+```bash
+cd go-mcp && go build -o ovationincentives-mcp .
+```
+
+Then add it to your agent's MCP config (Claude Desktop, Cursor, etc.):
+
+```json
+{
+  "mcpServers": {
+    "ovationincentives": {
+      "command": "/abs/path/to/ovationincentives-mcp"
+    }
+  }
+}
+```
 
 ## Entities
 
@@ -89,6 +166,83 @@ The API exposes one entity:
 
 The operations available across these entities are **load**, **create** — see each entity's
 own list above for exactly which it supports.
+
+## Quickstart in other languages
+
+### Python
+
+```python
+import os
+from ovationincentives_sdk import OvationincentivesSDK
+
+client = OvationincentivesSDK({
+    "apikey": os.environ.get("OVATIONINCENTIVES_APIKEY"),
+})
+
+
+# Load a specific code (returns the record, raises on error)
+code = client.Code().load({"id": "example_id"})
+print(code)
+```
+
+### PHP
+
+```php
+<?php
+require_once 'ovationincentives_sdk.php';
+
+$client = new OvationincentivesSDK([
+    "apikey" => getenv("OVATIONINCENTIVES_APIKEY"),
+]);
+
+
+// Load a specific code (returns the ENTITY; call data_get() for the record; throws on error)
+$code = $client->Code()->load(["id" => "example_id"]);
+print_r($code);
+```
+
+### Golang
+
+```go
+import sdk "github.com/voxgig-sdk/ovationincentives-sdk/go"
+
+client := sdk.NewOvationincentivesSDK(map[string]any{
+    "apikey": os.Getenv("OVATIONINCENTIVES_APIKEY"),
+})
+
+// Load code data
+code, err := client.Code(nil).Load(map[string]any{"id": "example_id"}, nil)
+if err != nil {
+    panic(err)
+}
+fmt.Println(code)
+```
+
+### Lua
+
+```lua
+local sdk = require("ovationincentives_sdk")
+
+local client = sdk.new({
+  apikey = os.getenv("OVATIONINCENTIVES_APIKEY"),
+})
+
+
+-- Load a specific code
+local code, err = client:Code():load({ id = "example_id" })
+print(code)
+```
+
+### JavaScript
+
+```js
+const { OvationincentivesSDK } = require('@voxgig-sdk/ovationincentives-js')
+
+const client = new OvationincentivesSDK({
+  apikey: process.env.OVATIONINCENTIVES_APIKEY,
+})
+
+```
 
 ## Direct and prepare
 
@@ -108,6 +262,59 @@ When the entity interface does not cover an endpoint, use `direct`:
 
 **TypeScript:**
 ```ts
+const result = await client.direct({
+  path: '/api/resource/{id}',
+  method: 'GET',
+  params: { id: 'example' },
+})
+if (result instanceof Error) {
+  throw result
+}
+console.log(result.data)
+```
+
+**Python:**
+```python
+result = client.direct({
+    "path": "/api/resource/{id}",
+    "method": "GET",
+    "params": {"id": "example"},
+})
+```
+
+**PHP:**
+```php
+$result = $client->direct([
+    "path" => "/api/resource/{id}",
+    "method" => "GET",
+    "params" => ["id" => "example"],
+]);
+```
+
+**Go:**
+```go
+result, err := client.Direct(map[string]any{
+    "path":   "/api/resource/{id}",
+    "method": "GET",
+    "params": map[string]any{"id": "example"},
+})
+if err != nil {
+    panic(err)
+}
+fmt.Println(result)
+```
+
+**Lua:**
+```lua
+local result, err = client:direct({
+  path = "/api/resource/{id}",
+  method = "GET",
+  params = { id = "example" },
+})
+```
+
+**JavaScript:**
+```js
 const result = await client.direct({
   path: '/api/resource/{id}',
   method: 'GET',
@@ -147,6 +354,11 @@ Pass custom features via the `extend` option at construction time.
 ## Per-language documentation
 
 - [TypeScript](ts/README.md)
+- [Python](py/README.md)
+- [PHP](php/README.md)
+- [Golang](go/README.md)
+- [Lua](lua/README.md)
+- [JavaScript](js/README.md)
 
 ## Upstream API
 

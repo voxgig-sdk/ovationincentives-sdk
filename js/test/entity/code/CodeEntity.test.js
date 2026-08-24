@@ -1,0 +1,125 @@
+
+const envlocal = __dirname + '/../../../.env.local'
+require('dotenv').config({ quiet: true, path: [envlocal] })
+
+const Path = require('node:path')
+const Fs = require('node:fs')
+
+const { test, describe } = require('node:test')
+const assert = require('node:assert')
+
+
+const { OvationincentivesSDK, BaseFeature, stdutil, config } = require('../../..')
+
+const {
+  envOverride,
+  makeCtrl,
+  makeMatch,
+  makeReqdata,
+  makeStepData,
+  makeValid,
+} = require('../../utility')
+
+
+describe('CodeEntity', async () => {
+
+  test('instance', async () => {
+    const testsdk = OvationincentivesSDK.test()
+    const ent = testsdk.Code()
+    assert(null != ent)
+  })
+
+
+  test('basic', async () => {
+
+    const setup = basicSetup()
+    const client = setup.client
+    const struct = setup.struct
+
+    const isempty = struct.isempty
+    const select = struct.select
+
+
+    // CREATE
+    const code_ref01_ent = client.Code()
+    let code_ref01_data = setup.data.new.code['code_ref01']
+
+    code_ref01_data = (await code_ref01_ent.create(code_ref01_data)).data()
+    assert(null != code_ref01_data.id)
+
+
+    // LOAD
+    const code_ref01_match_dt0 = {}
+    code_ref01_match_dt0.id = code_ref01_data.id
+    const code_ref01_data_dt0 = (await code_ref01_ent.load(code_ref01_match_dt0)).data()
+    assert(code_ref01_data_dt0.id === code_ref01_data.id)
+
+
+  })
+})
+
+
+
+function basicSetup(extra) {
+  // TODO: fix test def options
+  const options = {} // null
+
+  // TODO: needs test utility to resolve path
+  const entityDataFile =
+    Path.resolve(__dirname,
+      '../../../../.sdk/test/entity/code/CodeTestData.json')
+
+  // TODO: file ready util needed?
+  const entityDataSource = Fs.readFileSync(entityDataFile).toString('utf8')
+
+  // TODO: need a xlang JSON parse utility in voxgig/struct with better error msgs
+  const entityData = JSON.parse(entityDataSource)
+
+  options.entity = entityData.existing
+
+  let client = OvationincentivesSDK.test(options, extra)
+  const struct = client.utility().struct
+  const merge = struct.merge
+  const transform = struct.transform
+
+  let idmap = transform(
+    ['code01','code02','code03'],
+    {
+      '`$PACK`': ['', {
+        '`$KEY`': '`$COPY`',
+        '`$VAL`': ['`$FORMAT`', 'upper', '`$COPY`']
+      }]
+    })
+
+  const env = envOverride({
+    'OVATIONINCENTIVES_TEST_CODE_ENTID': idmap,
+    'OVATIONINCENTIVES_TEST_LIVE': 'FALSE',
+    'OVATIONINCENTIVES_TEST_EXPLAIN': 'FALSE',
+    'OVATIONINCENTIVES_APIKEY': 'NONE',
+  })
+
+  idmap = env['OVATIONINCENTIVES_TEST_CODE_ENTID']
+
+  if ('TRUE' === env.OVATIONINCENTIVES_TEST_LIVE) {
+    client = new OvationincentivesSDK(merge([
+      {
+        apikey: env.OVATIONINCENTIVES_APIKEY,
+      },
+      extra
+    ]))
+  }
+
+  const setup = {
+    idmap,
+    env,
+    options,
+    client,
+    struct,
+    data: entityData,
+    explain: 'TRUE' === env.OVATIONINCENTIVES_TEST_EXPLAIN,
+    now: Date.now(),
+  }
+
+  return setup
+}
+  
