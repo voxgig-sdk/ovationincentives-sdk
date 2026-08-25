@@ -1,6 +1,15 @@
 {
+  "NAME": "OVATIONINCENTIVES",
+  "Name": "Ovationincentives",
   "def": "ovationincentives-code-only.json",
   "main": {
+    "api": {
+      "entity": {},
+      "guide": {}
+    },
+    "custom": {
+      "plurals": {}
+    },
     "def": {
       "desc": ""
     },
@@ -866,5 +875,8 @@
     }
   },
   "name": "ovationincentives",
+  "name-": "ovationincentives",
+  "name_": "ovationincentives",
+  "name__orig": "ovationincentives",
   "origin": "voxgig-sdk"
 }
