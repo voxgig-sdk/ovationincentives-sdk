@@ -25,16 +25,8 @@ class Code(TypedDict, total=False):
     status: str
 
 
-class CodeLoadMatchRequired(TypedDict):
+class CodeLoadMatch(TypedDict):
     id: str
-
-
-class CodeLoadMatch(CodeLoadMatchRequired, total=False):
-    catalog_id: str
-    created_at: str
-    denomination: float
-    recipient_email: str
-    status: str
 
 
 class CodeCreateData(TypedDict, total=False):

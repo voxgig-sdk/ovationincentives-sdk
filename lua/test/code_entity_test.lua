@@ -97,7 +97,7 @@ function code_basic_setup(extra)
     ["OVATIONINCENTIVES_TEST_CODE_ENTID"] = idmap,
     ["OVATIONINCENTIVES_TEST_LIVE"] = "FALSE",
     ["OVATIONINCENTIVES_TEST_EXPLAIN"] = "FALSE",
-    ["OVATIONINCENTIVES_APIKEY"] = "NONE",
+    ["OVATIONINCENTIVES_APIKEY"] = "",
   })
 
   local idmap_resolved = helpers.to_map(
@@ -108,6 +108,9 @@ function code_basic_setup(extra)
 
   if env["OVATIONINCENTIVES_TEST_LIVE"] == "TRUE" then
     local merged_opts = vs.merge({
+      -- FIRST, so the generated fields below win: sdk-test-control.json's
+      -- test.client.options adds to the live client, it does not redirect it.
+      runner.live_client_options(),
       {
         apikey = env["OVATIONINCENTIVES_APIKEY"],
       },

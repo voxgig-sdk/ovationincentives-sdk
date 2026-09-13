@@ -15,12 +15,7 @@
 ---@field status? string
 
 ---@class CodeLoadMatch
----@field catalog_id? string
----@field created_at? string
----@field denomination? number
 ---@field id string
----@field recipient_email? string
----@field status? string
 
 ---@class CodeCreateData
 ---@field catalog_id? string

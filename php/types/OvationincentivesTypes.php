@@ -26,12 +26,7 @@ class Code
 /** Request payload for Code#load. */
 class CodeLoadMatch
 {
-    public ?string $catalog_id = null;
-    public ?string $created_at = null;
-    public ?float $denomination = null;
     public string $id;
-    public ?string $recipient_email = null;
-    public ?string $status = null;
 }
 
 /** Request payload for Code#create. */

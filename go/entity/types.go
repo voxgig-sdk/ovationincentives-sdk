@@ -24,12 +24,7 @@ type Code struct {
 
 // CodeLoadMatch is the typed request payload for Code.LoadTyped.
 type CodeLoadMatch struct {
-	CatalogId *string `json:"catalog_id,omitempty"`
-	CreatedAt *string `json:"created_at,omitempty"`
-	Denomination *float64 `json:"denomination,omitempty"`
 	Id string `json:"id"`
-	RecipientEmail *string `json:"recipient_email,omitempty"`
-	Status *string `json:"status,omitempty"`
 }
 
 // CodeCreateData is the typed request payload for Code.CreateTyped.

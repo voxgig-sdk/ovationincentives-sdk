@@ -15,12 +15,7 @@ export interface Code {
 }
 
 export interface CodeLoadMatch {
-  catalog_id?: string
-  created_at?: string
-  denomination?: number
   id: string
-  recipient_email?: string
-  status?: string
 }
 
 export interface CodeCreateData {

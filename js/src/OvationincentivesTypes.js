@@ -18,12 +18,7 @@
 
 /**
  * @typedef {Object} CodeLoadMatch
- * @property {string} [catalog_id]
- * @property {string} [created_at]
- * @property {number} [denomination]
  * @property {string} id
- * @property {string} [recipient_email]
- * @property {string} [status]
  */
 
 /**
