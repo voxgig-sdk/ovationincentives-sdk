@@ -60,6 +60,12 @@ main: kit: entity: code: {
       name: "create"
       points: [
         {
+          contract: {
+            id: "POST /api/Code"
+            json: "{\"operationId\":\"createCode\",\"parameters\":[],\"protocol\":\"http\",\"requestBody\":{\"content\":{\"application/json\":{\"schema\":{\"properties\":{\"catalog_id\":{\"type\":\"string\"},\"denomination\":{\"type\":\"number\"},\"recipient_email\":{\"type\":\"string\"}},\"required\":[\"catalog_id\",\"denomination\"],\"type\":\"object\"}}},\"required\":true},\"responses\":{\"200\":{\"content\":{\"application/json\":{\"schema\":{\"properties\":{\"catalog_id\":{\"type\":\"string\"},\"created_at\":{\"type\":\"string\"},\"denomination\":{\"type\":\"number\"},\"id\":{\"type\":\"string\"},\"recipient_email\":{\"type\":\"string\"},\"status\":{\"type\":\"string\"}},\"type\":\"object\"}}},\"description\":\"The issued code\"}},\"security\":[{\"bearerAuth\":[]}],\"securitySchemes\":{\"bearerAuth\":{\"scheme\":\"bearer\",\"type\":\"http\"}},\"securitySource\":\"definition\"}"
+            source: "openapi3"
+            version: 1
+          }
           method: "POST"
           orig: "/api/Code"
           segments: [
@@ -91,6 +97,12 @@ main: kit: entity: code: {
                 type: "`$STRING`"
               }
             ]
+          }
+          contract: {
+            id: "GET /api/Code"
+            json: "{\"operationId\":\"getCode\",\"parameters\":[{\"in\":\"query\",\"name\":\"id\",\"required\":true,\"schema\":{\"type\":\"string\"}}],\"protocol\":\"http\",\"responses\":{\"200\":{\"content\":{\"application/json\":{\"schema\":{\"properties\":{\"catalog_id\":{\"type\":\"string\"},\"created_at\":{\"type\":\"string\"},\"denomination\":{\"type\":\"number\"},\"id\":{\"type\":\"string\"},\"recipient_email\":{\"type\":\"string\"},\"status\":{\"type\":\"string\"}},\"type\":\"object\"}}},\"description\":\"The requested code\"}},\"security\":[{\"bearerAuth\":[]}],\"securitySchemes\":{\"bearerAuth\":{\"scheme\":\"bearer\",\"type\":\"http\"}},\"securitySource\":\"definition\"}"
+            source: "openapi3"
+            version: 1
           }
           method: "GET"
           orig: "/api/Code"

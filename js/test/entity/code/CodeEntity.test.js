@@ -1,12 +1,14 @@
 
 const envlocal = __dirname + '/../../../.env.local'
-require('dotenv').config({ quiet: true, path: [envlocal] })
+require('../../utility').loadEnvLocal(envlocal)
 
 const Path = require('node:path')
 const Fs = require('node:fs')
 
 const { test, describe, afterEach } = require('node:test')
 const assert = require('node:assert')
+const { createLiveTransport } = require('../../live-runner')
+const { runLiveEntity } = require('../../live-entity')
 
 
 const { OvationincentivesSDK, BaseFeature, stdutil, config } = require('../../..')
@@ -36,9 +38,13 @@ describe('CodeEntity', async () => {
   })
 
 
-  test('basic', async () => {
+  test('basic', async (t) => {
 
+    
     const setup = basicSetup()
+    if (setup.live) {
+      return runLiveEntity(setup, {"active":true,"alias":{"field":{}},"fields":[{"active":true,"name":"catalog_id","op":{"create":{"req":true,"type":"`$STRING`"}},"req":false,"type":"`$STRING`","index$":0},{"active":true,"name":"created_at","req":false,"type":"`$STRING`","index$":1},{"active":true,"name":"denomination","op":{"create":{"req":true,"type":"`$NUMBER`"}},"req":false,"type":"`$NUMBER`","index$":2},{"active":true,"name":"id","req":false,"type":"`$STRING`","index$":3},{"active":true,"name":"recipient_email","req":false,"type":"`$STRING`","index$":4},{"active":true,"name":"status","req":false,"type":"`$STRING`","index$":5}],"id":{"field":"id","name":"id"},"name":"code","op":{"create":{"input":"data","name":"create","points":[{"active":true,"args":{},"contract":{"id":"POST /api/Code","json":"{\"operationId\":\"createCode\",\"parameters\":[],\"protocol\":\"http\",\"requestBody\":{\"content\":{\"application/json\":{\"schema\":{\"properties\":{\"catalog_id\":{\"type\":\"string\"},\"denomination\":{\"type\":\"number\"},\"recipient_email\":{\"type\":\"string\"}},\"required\":[\"catalog_id\",\"denomination\"],\"type\":\"object\"}}},\"required\":true},\"responses\":{\"200\":{\"content\":{\"application/json\":{\"schema\":{\"properties\":{\"catalog_id\":{\"type\":\"string\"},\"created_at\":{\"type\":\"string\"},\"denomination\":{\"type\":\"number\"},\"id\":{\"type\":\"string\"},\"recipient_email\":{\"type\":\"string\"},\"status\":{\"type\":\"string\"}},\"type\":\"object\"}}},\"description\":\"The issued code\"}},\"security\":[{\"bearerAuth\":[]}],\"securitySchemes\":{\"bearerAuth\":{\"scheme\":\"bearer\",\"type\":\"http\"}},\"securitySource\":\"definition\"}","source":"openapi3","version":1},"kind":"http","method":"POST","orig":"/api/Code","segments":[{"lit":"api"},{"lit":"Code"}],"select":{},"transform":{"req":"`reqdata`","res":"`body`"},"index$":0}],"key$":"create"},"load":{"input":"data","name":"load","points":[{"active":true,"args":{"query":[{"active":true,"kind":"query","name":"id","orig":"id","reqd":true,"type":"`$STRING`","index$":0}]},"contract":{"id":"GET /api/Code","json":"{\"operationId\":\"getCode\",\"parameters\":[{\"in\":\"query\",\"name\":\"id\",\"required\":true,\"schema\":{\"type\":\"string\"}}],\"protocol\":\"http\",\"responses\":{\"200\":{\"content\":{\"application/json\":{\"schema\":{\"properties\":{\"catalog_id\":{\"type\":\"string\"},\"created_at\":{\"type\":\"string\"},\"denomination\":{\"type\":\"number\"},\"id\":{\"type\":\"string\"},\"recipient_email\":{\"type\":\"string\"},\"status\":{\"type\":\"string\"}},\"type\":\"object\"}}},\"description\":\"The requested code\"}},\"security\":[{\"bearerAuth\":[]}],\"securitySchemes\":{\"bearerAuth\":{\"scheme\":\"bearer\",\"type\":\"http\"}},\"securitySource\":\"definition\"}","source":"openapi3","version":1},"kind":"http","method":"GET","orig":"/api/Code","segments":[{"lit":"api"},{"lit":"Code"}],"select":{"exist":["id"]},"transform":{"req":"`reqdata`","res":"`body`"},"index$":0}],"key$":"load"}},"relations":{"ancestors":[]},"key$":"code","name__orig":"code","Name":"Code","name_":"code","name-":"code","NAME":"CODE","index$":0}, {"active":true,"entity":"code","key$":"BasicCodeFlow","kind":"basic","name":"BasicCodeFlow","param":{},"step":[{"active":true,"data":{},"input":{"ref":"code_ref01"},"match":{},"op":"create","spec":[],"valid":[],"index$":0},{"active":true,"data":{},"input":{"ref":"code_ref01","srcdatavar":"code_ref01_data","suffix":"_dt0"},"match":{},"op":"load","spec":[],"valid":[{"apply":"TextFieldMark","def":{"mark":"Mark01-code_ref01"}}],"index$":1}]}, 'Code')
+    }
     const client = setup.client
     const struct = setup.struct
 
@@ -106,7 +112,14 @@ function basicSetup(extra) {
 
   idmap = env['OVATIONINCENTIVES_TEST_CODE_ENTID']
 
-  if ('TRUE' === env.OVATIONINCENTIVES_TEST_LIVE) {
+  const live = 'TRUE' === env.OVATIONINCENTIVES_TEST_LIVE
+  const transport = createLiveTransport()
+  if (live) {
+    const rawIds = process.env['OVATIONINCENTIVES_TEST_CODE_ENTID']
+    idmap = rawIds && rawIds.trim() ? JSON.parse(rawIds) : {}
+    if (!idmap || Array.isArray(idmap) || typeof idmap !== 'object') {
+      throw new Error('Live ENTID must be a JSON object')
+    }
     client = new OvationincentivesSDK(merge([
       // FIRST, so the generated fields below win: sdk-test-control.json's
       // test.client.options adds to the live client, it does not redirect it.
@@ -118,7 +131,8 @@ function basicSetup(extra) {
       // the last entry is undefined, and basicSetup is normally called with no
       // argument at all - so a bare 'extra' silently discarded the apikey and
       // server values above and handed the SDK undefined.
-      extra || {}
+      extra || {},
+      { system: { fetch: transport.fetch } }
     ]))
   }
 
@@ -130,6 +144,8 @@ function basicSetup(extra) {
     struct,
     data: entityData,
     explain: 'TRUE' === env.OVATIONINCENTIVES_TEST_EXPLAIN,
+    live,
+    transport,
     now: Date.now(),
   }
 

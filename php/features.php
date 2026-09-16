@@ -4,7 +4,14 @@ declare(strict_types=1);
 // Ovationincentives SDK feature factory
 
 require_once __DIR__ . '/feature/BaseFeature.php';
+require_once __DIR__ . '/feature/DebugFeature.php';
+require_once __DIR__ . '/feature/IdempotencyFeature.php';
+require_once __DIR__ . '/feature/MetricsFeature.php';
+require_once __DIR__ . '/feature/PagingFeature.php';
+require_once __DIR__ . '/feature/RatelimitFeature.php';
+require_once __DIR__ . '/feature/RetryFeature.php';
 require_once __DIR__ . '/feature/TestFeature.php';
+require_once __DIR__ . '/feature/TimeoutFeature.php';
 
 
 class OvationincentivesFeatures
@@ -14,8 +21,22 @@ class OvationincentivesFeatures
         switch ($name) {
             case "base":
                 return new OvationincentivesBaseFeature();
+            case "debug":
+                return new OvationincentivesDebugFeature();
+            case "idempotency":
+                return new OvationincentivesIdempotencyFeature();
+            case "metrics":
+                return new OvationincentivesMetricsFeature();
+            case "paging":
+                return new OvationincentivesPagingFeature();
+            case "ratelimit":
+                return new OvationincentivesRatelimitFeature();
+            case "retry":
+                return new OvationincentivesRetryFeature();
             case "test":
                 return new OvationincentivesTestFeature();
+            case "timeout":
+                return new OvationincentivesTimeoutFeature();
             default:
                 return new OvationincentivesBaseFeature();
         }
@@ -31,7 +52,14 @@ class OvationincentivesFeatures
     {
         switch ($name) {
             case "base":
+            case "debug":
+            case "idempotency":
+            case "metrics":
+            case "paging":
+            case "ratelimit":
+            case "retry":
             case "test":
+            case "timeout":
                 return true;
             default:
                 return false;
